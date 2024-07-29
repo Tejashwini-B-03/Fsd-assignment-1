@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Enrollment</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Student Enrollment</h1>
+    <form id="student-form" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+    <div id="message"></div>
+
+    <a href="{% url 'generate_csv' %}">Download CSV</a>
+    <a href="{% url 'generate_pdf' %}">Download PDF</a>
+
+    <script>
+        $(document).ready(function(){
+            $('#student-form').on('submit', function(event){
+                event.preventDefault();
+                $.ajax({
+                    url: "{% url 'register_student' %}",
+                    method: "POST",
+                    data: $(this).serialize(),
+                    success: function(response){
+                        if (response.errors) {
+                            $('#message').html('<p>' + response.errors + '</p>');
+                        } else {
+                            $('#message').html('<p>' + response.message + '</p>');
+                            $('#student-form')[0].reset();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
